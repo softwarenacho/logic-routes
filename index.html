@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Logic routes finder</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+</head>
+<body>
+  <h1>Logic routes finder</h1>
+  <p>
+    Upload your CSV file to obtain the logic routes for your address
+  </p>
+  <div>
+    <form>
+      <input
+        type="file"
+        accept=".csv"
+        name="upload"
+        id="upload"
+      >
+    </form>
+    <div id="map" style="height: 400px; width: 640px;"></div>
+  </div>
+  <script>
+
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 11,
+        center: {lat: 19.3910038, lng: -99.2836963},
+      });
+      const geocoder = new google.maps.Geocoder();
+      const upload = document.getElementById('upload')
+      upload.addEventListener('change', () => {
+        changeFile(geocoder, map);
+      });
+    }
+
+    async function geocodeAddress(geocoder, map, address) {
+      geocoder.geocode({'address': address}, (results, status) => {
+        if (status === 'OK') {
+          map.setCenter(results[0].geometry.location);
+          const marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+          });
+        } else {
+          console.log('Geocode was not successful for the following reason: ' + status);
+        }
+      });
+    }
+
+    function changeFile(geocoder, map){
+      const file = document.getElementById("upload");
+      if (file) {
+        const csv = file.files[0];
+        const json = Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: true,
+          complete: async results => {
+            const minResults = results.data.slice(0, 10);
+            minResults.forEach(result => {
+              const address = `${result.StreetName} ${result.StreetNumber}, ${result.Neighborhood}, ${result.ZipCode}`;
+              geocodeAddress(geocoder, map, address);
+            })
+          }
+        });
+      }
+    }
+
+  </script>
+  <script src="papaparse.min.js"></script>
+  <script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=<GOOGLE_API_KEY>&callback=initMap">
+  </script>
+</body>
+</html>
