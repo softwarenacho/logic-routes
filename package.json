@@ -1,5 +1,5 @@
 {
-  "name": "Routes Map from CSV",
+  "name": "routes-map-from-csv",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
