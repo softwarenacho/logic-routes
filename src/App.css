@@ -4,13 +4,26 @@
   align-items: center;
  }
 
- #map {
+#addreses {
+  margin-right: 2rem;
+  min-width: 400px;
+  max-height: 400px;
+  overflow: scroll;
+}
+
+.address {
+  margin-top: 1rem;
+  display: flex;
+}
+
+#map {
   min-height: 400px;
-  width: 100%;
-  max-width: 400px;
+  min-width: 400px;
 }
 
 .container {
-  max-width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 4rem;
 }
