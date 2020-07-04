@@ -2,18 +2,26 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Papa from './Components/Papa';
 import Map from './Components/Map';
+import * as functions from 'firebase-functions';
 
 function App() {
-
   const [addressList, setAddressList] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [googleLoaded, setGoogleLoaded] = useState(false);
 
   useEffect(() => {
-    let s = document.createElement('script');
-    s.src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=API_KEY&v=3";
-    document.body.appendChild(s);
-    s.addEventListener('load', () => setGoogleLoaded(true));
+    let key = '';
+    console.log('FUNCTIONS config', functions?.config())
+    if (functions?.config()?.google) {
+      key = functions.config().google.key;
+      console.log('KEY from functions', key);
+    } else {
+      key = process.env.REACT_APP_GOOGLE_APIKEY;
+    }
+    const google = document.createElement('script');
+    google.src = `https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=${key}&v=3`;
+    document.body.appendChild(google);
+    google.addEventListener('load', () => setGoogleLoaded(true));
   }, []);
 
   useEffect(() => {
@@ -36,7 +44,7 @@ function App() {
   const getGeocode = result => {
     const ids = markers.map(m => m.id);
     if (ids.includes(result.id)) {
-      const filteredMarkers = markers.filter(m => m.id != result.id);
+      const filteredMarkers = markers.filter(m => m.id !== result.id);
       clearMap();
       setMarkers(filteredMarkers);
     } else {
